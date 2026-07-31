@@ -8,15 +8,22 @@
         "splunk",
         "incident response",
         "log analysis",
+        "event analysis",
         "threat detection",
-        "malware analysis",
-        "digital forensics",
-        "security monitoring"
+        "security monitoring",
+        "windows logs",
+        "linux",
+        "host hardening",
+        "firewall",
+        "pcap analysis",
+        "network monitoring",
+        "vulnerability management"
     ],
     "roles": [
         "soc analyst",
         "security analyst",
         "incident response analyst",
-        "threat analyst"
+        "threat analyst",
+        "cyber security analyst"
     ]
 }

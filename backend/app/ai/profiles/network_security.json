@@ -6,12 +6,19 @@
         "routing",
         "switching",
         "firewalls",
+        "acl",
         "vpn",
         "wireshark",
         "network security",
         "ids",
         "ips",
-        "cloud networking"
+        "packet analysis",
+        "computer networks",
+        "aodv",
+        "vanet",
+        "omnet++",
+        "veins",
+        "sumo"
     ],
     "roles": [
         "network security engineer",

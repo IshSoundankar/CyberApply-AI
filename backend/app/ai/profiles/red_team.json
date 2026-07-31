@@ -7,11 +7,14 @@
         "burp suite",
         "owasp",
         "web application security",
+        "sql injection",
+        "xss",
         "vulnerability assessment",
-        "nmap",
-        "metasploit",
+        "nessus",
+        "zap",
+        "rips",
         "kali linux",
-        "exploit development"
+        "security testing"
     ],
     "roles": [
         "penetration tester",
