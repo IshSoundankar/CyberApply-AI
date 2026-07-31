@@ -1,0 +1,22 @@
+{
+    "name": "Network Security",
+    "cv_file": "network_security_cv.pdf",
+    "skills": [
+        "tcp/ip",
+        "routing",
+        "switching",
+        "firewalls",
+        "vpn",
+        "wireshark",
+        "network security",
+        "ids",
+        "ips",
+        "cloud networking"
+    ],
+    "roles": [
+        "network security engineer",
+        "security engineer",
+        "network analyst",
+        "firewall analyst"
+    ]
+}

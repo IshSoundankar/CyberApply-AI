@@ -1,0 +1,22 @@
+{
+    "name": "Blue Team",
+    "cv_file": "blue_team_cv.pdf",
+    "skills": [
+        "soc",
+        "siem",
+        "wazuh",
+        "splunk",
+        "incident response",
+        "log analysis",
+        "threat detection",
+        "malware analysis",
+        "digital forensics",
+        "security monitoring"
+    ],
+    "roles": [
+        "soc analyst",
+        "security analyst",
+        "incident response analyst",
+        "threat analyst"
+    ]
+}

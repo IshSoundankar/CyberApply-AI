@@ -1,0 +1,22 @@
+{
+    "name": "Red Team",
+    "cv_file": "red_team_cv.pdf",
+    "skills": [
+        "penetration testing",
+        "ethical hacking",
+        "burp suite",
+        "owasp",
+        "web application security",
+        "vulnerability assessment",
+        "nmap",
+        "metasploit",
+        "kali linux",
+        "exploit development"
+    ],
+    "roles": [
+        "penetration tester",
+        "security consultant",
+        "application security analyst",
+        "vulnerability analyst"
+    ]
+}
