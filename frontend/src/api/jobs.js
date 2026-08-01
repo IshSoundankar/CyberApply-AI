@@ -1,11 +1,42 @@
 import axios from "axios";
 
+
 const API = axios.create({
+
     baseURL: "http://127.0.0.1:8000"
+
 });
 
 
+
 export async function getTopJobs() {
-    const response = await API.get("/jobs/top");
+
+    const response = await API.get(
+        "/jobs/top"
+    );
+
     return response.data;
+
+}
+
+
+
+export async function updateJobStatus(
+    id,
+    status
+) {
+
+    const response = await API.patch(
+
+        `/jobs/${id}`,
+
+        {
+            status: status
+        }
+
+    );
+
+
+    return response.data;
+
 }

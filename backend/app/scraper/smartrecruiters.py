@@ -1,14 +1,15 @@
 import requests
 
 
-def get_lever_jobs(company):
+def get_smartrecruiter_jobs(company):
 
     url = (
-        f"https://api.lever.co/v0/postings/"
-        f"{company}?mode=json"
+        f"https://api.smartrecruiters.com/"
+        f"v1/companies/{company}/postings"
     )
 
     results = []
+
 
     try:
 
@@ -22,37 +23,37 @@ def get_lever_jobs(company):
             return results
 
 
-        jobs = response.json()
+        data = response.json()
 
 
-        for job in jobs:
+        for job in data.get(
+            "content",
+            []
+        ):
 
             results.append(
                 {
                     "title": job.get(
-                        "text",
+                        "name",
                         ""
                     ),
 
                     "location": job.get(
-                        "categories",
+                        "location",
                         {}
                     ).get(
-                        "location",
+                        "city",
                         ""
                     ),
 
-                    "description": job.get(
-                        "descriptionPlain",
-                        ""
-                    ),
+                    "description": "",
 
                     "url": job.get(
-                        "hostedUrl",
+                        "ref",
                         ""
                     ),
 
-                    "source": "Lever"
+                    "source": "SmartRecruiters"
                 }
             )
 
@@ -60,7 +61,7 @@ def get_lever_jobs(company):
     except Exception as e:
 
         print(
-            "Lever error:",
+            "SmartRecruiters error:",
             company,
             e
         )

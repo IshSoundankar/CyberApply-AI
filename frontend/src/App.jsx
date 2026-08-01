@@ -1,9 +1,16 @@
 import "./App.css";
+
 import { useEffect, useState } from "react";
-import { getTopJobs } from "./api/jobs";
+
+import {
+  getTopJobs,
+  updateJobStatus
+} from "./api/jobs";
+
 
 
 function App() {
+
 
   const [jobs, setJobs] = useState([]);
 
@@ -13,14 +20,18 @@ function App() {
 
 
 
+
   useEffect(() => {
 
+
     getTopJobs()
+
       .then(data => {
 
         setJobs(data);
 
       })
+
       .catch(error => {
 
         console.error(
@@ -30,7 +41,93 @@ function App() {
 
       });
 
+
   }, []);
+
+
+
+
+
+
+  async function changeStatus(
+    id,
+    status
+  ) {
+
+
+    try {
+
+
+      await updateJobStatus(
+        id,
+        status
+      );
+
+
+
+      setJobs(
+
+        jobs.map(job =>
+
+          job.id === id
+
+          ?
+
+          {
+            ...job,
+            status: status
+          }
+
+          :
+
+          job
+
+        )
+
+      );
+
+
+    }
+
+    catch(error) {
+
+
+      console.error(
+        "Status update failed:",
+        error
+      );
+
+
+    }
+
+  }
+
+
+
+
+
+
+  const totalJobs = jobs.length;
+
+
+  const savedJobs = jobs.filter(
+    job => job.status === "SAVED"
+  ).length;
+
+
+
+  const appliedJobs = jobs.filter(
+    job => job.status === "APPLIED"
+  ).length;
+
+
+
+  const rejectedJobs = jobs.filter(
+    job => job.status === "REJECTED"
+  ).length;
+
+
+
 
 
 
@@ -38,41 +135,59 @@ function App() {
   const filteredJobs = jobs.filter(job => {
 
 
-    const text =
-      (
-        job.title +
-        job.company +
-        job.cv_type
-      ).toLowerCase();
+    const text = (
+
+      job.title +
+
+      job.company +
+
+      job.cv_type
+
+    ).toLowerCase();
+
 
 
 
     const matchesSearch =
+
       text.includes(
         search.toLowerCase()
       );
 
 
 
+
     const matchesFilter =
+
       filter === "ALL" ||
+
       job.cv_type === filter;
 
 
 
+
     return (
+
       matchesSearch &&
+
       matchesFilter
+
     );
+
 
   });
 
 
 
 
+
+
+
   return (
 
+
     <div className="dashboard">
+
 
 
       <div className="header">
@@ -84,7 +199,76 @@ function App() {
 
 
 
+
+
+      <div className="stats">
+
+
+
+        <div className="stat-card">
+
+          Total Jobs
+
+          <strong>
+            {totalJobs}
+          </strong>
+
+        </div>
+
+
+
+
+
+        <div className="stat-card">
+
+          Saved
+
+          <strong>
+            {savedJobs}
+          </strong>
+
+        </div>
+
+
+
+
+
+        <div className="stat-card">
+
+          Applied
+
+          <strong>
+            {appliedJobs}
+          </strong>
+
+        </div>
+
+
+
+
+
+        <div className="stat-card">
+
+          Rejected
+
+          <strong>
+            {rejectedJobs}
+          </strong>
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
       <div className="controls">
+
 
 
         <input
@@ -96,10 +280,13 @@ function App() {
           value={search}
 
           onChange={
-            (e)=>setSearch(e.target.value)
+            (e)=>
+            setSearch(e.target.value)
           }
 
         />
+
+
 
 
 
@@ -108,14 +295,17 @@ function App() {
           value={filter}
 
           onChange={
-            (e)=>setFilter(e.target.value)
+            (e)=>
+            setFilter(e.target.value)
           }
 
         >
 
+
           <option value="ALL">
             All
           </option>
+
 
 
           <option value="Blue Team">
@@ -123,9 +313,11 @@ function App() {
           </option>
 
 
+
           <option value="Network Security">
             Network Security
           </option>
+
 
 
           <option value="Security Engineering">
@@ -133,7 +325,9 @@ function App() {
           </option>
 
 
+
         </select>
+
 
 
       </div>
@@ -142,10 +336,15 @@ function App() {
 
 
 
+
+
+
       <div className="jobs-container">
 
 
+
         {filteredJobs.map(job => (
+
 
 
           <div
@@ -158,11 +357,13 @@ function App() {
 
 
 
+
             <h2>
 
               {job.title}
 
             </h2>
+
 
 
 
@@ -178,18 +379,24 @@ function App() {
 
 
 
+
             <p>
 
-              Location: {job.location}
+              Location:
+              {" "}
+              {job.location}
 
             </p>
 
 
 
 
+
             <p>
 
-              CV: {job.cv_type}
+              CV:
+              {" "}
+              {job.cv_type}
 
             </p>
 
@@ -209,53 +416,111 @@ function App() {
 
 
 
+
             <br />
 
 
 
 
 
-            <span className="status">
+
+            <label>
 
               Status:
-              {" "}
-              {job.status}
 
-            </span>
+            </label>
 
 
 
 
 
-            <br />
+            <select
 
 
+              className={
+                `status-${job.status.toLowerCase()}`
+              }
 
 
+              value={job.status}
 
-            <a
 
-              href={job.url}
+              onChange={
+                (e)=>
+                changeStatus(
+                  job.id,
+                  e.target.value
+                )
+              }
 
-              target="_blank"
-
-              rel="noreferrer"
 
             >
 
-              <button className="view-button">
 
-                View Job
 
-              </button>
+              <option value="NEW">
 
+                NEW
+
+              </option>
+
+
+
+              <option value="SAVED">
+
+                SAVED
+
+              </option>
+
+
+
+              <option value="APPLIED">
+
+                APPLIED
+
+              </option>
+
+
+
+              <option value="REJECTED">
+
+                REJECTED
+
+              </option>
+
+
+
+            </select>
+
+
+
+
+
+
+
+            <br />
+
+
+
+
+
+
+            <a href={`/job/${job.id}`}>
+
+            <button className="view-button">
+
+            View Job
+
+            </button>
 
             </a>
 
 
 
 
+
           </div>
+
 
 
         ))}
@@ -266,9 +531,13 @@ function App() {
 
 
 
+
+
     </div>
 
+
   );
+
 
 }
 

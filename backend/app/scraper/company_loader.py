@@ -1,7 +1,48 @@
-import json
+GREENHOUSE_COMPANIES = [
+    "cloudflare",
+    "crowdstrike",
+    "hashicorp",
+    "gitlab"
+]
 
 
-def load_companies():
+LEVER_COMPANIES = [
+    {
+        "name": "SentinelOne",
+        "board": "sentinelone"
+    },
+    {
+        "name": "Tailscale",
+        "board": "tailscale"
+    },
+    {
+        "name": "1Password",
+        "board": "1password"
+    },
+    {
+        "name": "Wiz",
+        "board": "wiz"
+    }
+]
 
-    with open("companies.json", "r") as file:
-        return json.load(file)
+
+SMARTRECRUITERS_COMPANIES = [
+    "Sophos",
+    "Rapid7"
+]
+
+
+WORKDAY_COMPANIES = [
+    {
+        "name": "TCS",
+        "url": "https://tcs.wd3.myworkdayjobs.com"
+    },
+    {
+        "name": "Infosys",
+        "url": "https://infosys.wd3.myworkdayjobs.com"
+    },
+    {
+        "name": "Wipro",
+        "url": "https://wipro.wd5.myworkdayjobs.com"
+    }
+]

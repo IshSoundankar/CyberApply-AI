@@ -1,61 +1,98 @@
 import requests
 
 
-def get_workday_jobs(company_url):
+def get_workday_jobs(
+    tenant,
+    domain,
+    limit=50
+):
+    """
+    Example:
+    tenant = "tcs"
+    domain = "myworkdayjobs.com"
+    
+    URL:
+    https://tcs.wd5.myworkdayjobs.com/wday/cxs/tcs/External/jobs
+    """
 
-    jobs = []
+    url = (
+        f"https://{tenant}.{domain}"
+        f"/wday/cxs/{tenant}/External/jobs"
+    )
+
+
+    payload = {
+        "limit": limit,
+        "offset": 0,
+        "searchText": ""
+    }
 
 
     try:
 
-        response = requests.get(
-            company_url,
+        response = requests.post(
+            url,
+            json=payload,
             timeout=15
         )
 
 
         if response.status_code != 200:
-            return jobs
+            print(
+                "Workday error:",
+                response.status_code,
+                tenant
+            )
+            return []
 
 
         data = response.json()
 
 
-        for item in data.get("jobPostings", []):
-
-            jobs.append(
-                {
-                    "title": item.get(
-                        "title",
-                        ""
-                    ),
-
-                    "location": item.get(
-                        "locationsText",
-                        ""
-                    ),
-
-                    "url": item.get(
-                        "externalPath",
-                        ""
-                    ),
-
-                    "description": item.get(
-                        "jobDescription",
-                        ""
-                    ),
-
-                    "source": "Workday"
-                }
-            )
-
-
-    except Exception as error:
+    except Exception as e:
 
         print(
-            "Workday error:",
-            error
+            "Workday exception:",
+            e
+        )
+
+        return []
+
+
+
+    results = []
+
+
+    for job in data.get(
+        "jobPostings",
+        []
+    ):
+
+        results.append(
+            {
+                "title": job.get(
+                    "title",
+                    ""
+                ),
+
+                "location": job.get(
+                    "locationsText",
+                    ""
+                ),
+
+                "url": (
+                    f"https://{tenant}.{domain}"
+                    + job.get(
+                        "externalPath",
+                        ""
+                    )
+                ),
+
+                "description": "",
+
+                "source": "Workday"
+            }
         )
 
 
-    return jobs
+    return results

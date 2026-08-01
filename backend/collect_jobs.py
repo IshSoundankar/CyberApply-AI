@@ -1,127 +1,196 @@
-import json
+from app.scraper.greenhouse import get_greenhouse_jobs
+from app.scraper.lever import get_lever_jobs
+from app.scraper.smartrecruiters import get_smartrecruiter_jobs
+from app.scraper.workday import get_workday_jobs
 
-from app.database.database import Base, engine, SessionLocal
+from app.scraper.company_loader import (
+    GREENHOUSE_COMPANIES,
+    LEVER_COMPANIES,
+    SMARTRECRUITERS_COMPANIES
+)
 
-# Register SQLAlchemy models BEFORE create_all
+from app.database.database import SessionLocal, Base, engine
 from app.models.job import Job
-
-from app.services.job_service import save_job
-from app.scraper.registry import get_scraper
 from app.services.job_filter import is_relevant_job
 
+Base.metadata.create_all(bind=engine)
 
-
-def load_companies():
-
-    with open("companies.json", "r") as file:
-        return json.load(file)
-
-
-
-def main():
-
-    print(
-        "Tables:",
-        Base.metadata.tables.keys()
-    )
-
-
-    Base.metadata.create_all(
-        bind=engine
-    )
-
+def save_job(job):
 
     db = SessionLocal()
 
-
-    try:
-
-        companies = load_companies()
-
-
-        for company in companies:
+    existing = db.query(Job).filter(
+        Job.url == job["url"]
+    ).first()
 
 
-            print(
-                f"\nChecking {company['company']}..."
+    if existing:
+
+        db.close()
+        return False
+
+
+    new_job = Job(
+        title=job.get(
+            "title",
+            ""
+        ),
+
+        company=job.get(
+            "company",
+            job.get(
+                "source",
+                ""
             )
+        ),
+
+        location=job.get(
+            "location",
+            ""
+        ),
+
+        description=job.get(
+            "description",
+            ""
+        ),
+
+        url=job.get(
+            "url",
+            ""
+        )
+    )
 
 
-            scraper = get_scraper(
-                company["platform"]
+    db.add(new_job)
+
+    db.commit()
+
+    db.close()
+
+    return True
+
+
+
+def collect_jobs():
+
+    jobs = []
+
+
+    print("Checking Greenhouse...")
+
+
+    for company in GREENHOUSE_COMPANIES:
+
+        print(company)
+
+        jobs.extend(
+            get_greenhouse_jobs(
+                company
             )
-
-
-            if not scraper:
-
-                print(
-                    "No scraper found"
-                )
-
-                continue
-
-
-
-            jobs = scraper(
-                company["board"]
-            )
-
-
-
-            for job_data in jobs:
-
-
-                print(
-                    f"Extracting: {job_data.get('title')}"
-                )
-
-
-                # Add company name
-                job_data["company"] = company["company"]
-
-
-
-                # Filter jobs before saving
-                if not is_relevant_job(job_data):
-
-                    print(
-                        f"Skipped: {job_data.get('title')}"
-                    )
-
-                    continue
-
-
-
-
-                saved = save_job(
-                    db,
-                    job_data
-                )
-
-
-
-                print(
-                    f"Saved: {saved.title} | Score: {saved.ai_score}"
-                )
-
-
-
-    except Exception as e:
-
-        print(
-            "ERROR:",
-            e
         )
 
 
+    print("Checking Lever...")
 
-    finally:
 
-        db.close()
+    for company in LEVER_COMPANIES:
 
+        print(
+            company["name"]
+        )
+
+        jobs.extend(
+            get_lever_jobs(
+                company["board"]
+            )
+        )
+
+
+    print("Checking SmartRecruiters...")
+
+
+    for company in SMARTRECRUITERS_COMPANIES:
+
+        print(company)
+
+        jobs.extend(
+            get_smartrecruiter_jobs(
+                company
+            )
+        )
+
+
+    print(
+        "TOTAL FOUND:",
+        len(jobs)
+    )
+
+
+    saved = 0
+    filtered = 0
+    duplicate = 0
+
+
+    for job in jobs:
+
+        title = job.get(
+            "title",
+            ""
+        )
+
+
+        if not is_relevant_job(job):
+
+            print(
+                "Filtered:",
+                title
+            )
+
+            filtered += 1
+            continue
+
+
+        result = save_job(job)
+
+
+        if result:
+
+            print(
+                "Saved:",
+                title
+            )
+
+            saved += 1
+
+        else:
+
+            print(
+                "Duplicate:",
+                title
+            )
+
+            duplicate += 1
+
+
+
+    print("\nSummary")
+    print(
+        "Saved:",
+        saved
+    )
+
+    print(
+        "Filtered:",
+        filtered
+    )
+
+    print(
+        "Duplicates:",
+        duplicate
+    )
 
 
 
 if __name__ == "__main__":
 
-    main()
+    collect_jobs()

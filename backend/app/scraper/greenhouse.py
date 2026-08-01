@@ -67,9 +67,6 @@ def get_greenhouse_jobs(company_board):
             job_url = job.get("absolute_url")
 
             description = extract_job_description(job_url)
-            print(
-                f"Description length: {len(description)}"
-            )
             jobs.append(
                 {
                     "title": title,
