@@ -2,22 +2,50 @@
     {
         "company": "Cloudflare",
         "platform": "greenhouse",
-        "board": "cloudflare"
+        "board": "cloudflare",
+        "region": "EU",
+        "level": "graduate"
     },
     {
         "company": "CrowdStrike",
         "platform": "greenhouse",
-        "board": "crowdstrike"
+        "board": "crowdstrike",
+        "region": "Global",
+        "level": "graduate"
     },
     {
         "company": "HashiCorp",
         "platform": "greenhouse",
-        "board": "hashicorp"
+        "board": "hashicorp",
+        "region": "Global",
+        "level": "graduate"
     },
-
     {
         "company": "GitLab",
         "platform": "lever",
-        "board": "gitlab"
+        "board": "gitlab",
+        "region": "Remote",
+        "level": "graduate"
+    },
+    {
+        "company": "Tata Consultancy Services",
+        "platform": "workday",
+        "board": "tcs",
+        "region": "India",
+        "level": "graduate"
+    },
+    {
+        "company": "Infosys",
+        "platform": "workday",
+        "board": "infosys",
+        "region": "India",
+        "level": "graduate"
+    },
+    {
+        "company": "Wipro",
+        "platform": "workday",
+        "board": "wipro",
+        "region": "India",
+        "level": "graduate"
     }
 ]

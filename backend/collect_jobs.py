@@ -7,20 +7,16 @@ from app.services.job_service import save_job
 from app.services.job_filter import is_relevant_job
 
 
-
 def main():
 
     db = SessionLocal()
 
-
     companies = load_companies()
-
 
     total_saved = 0
 
 
     for company in companies:
-
 
         print(
             f"\nChecking {company['company']}..."
@@ -28,18 +24,18 @@ def main():
 
 
         scraper = get_scraper(
-            company["platform"]
+            company.get("platform")
         )
 
 
         if scraper is None:
 
             print(
-                f"No scraper for {company['platform']}"
+                f"Skipping {company['company']} - "
+                f"{company['platform']} scraper not available"
             )
 
             continue
-
 
 
         try:
@@ -49,10 +45,10 @@ def main():
             )
 
 
-        except Exception as e:
+        except Exception as error:
 
             print(
-                f"Failed {company['company']}: {e}"
+                f"Failed {company['company']}: {error}"
             )
 
             continue
@@ -84,7 +80,6 @@ def main():
                 "Saved:",
                 saved.title
             )
-
 
 
     db.close()
