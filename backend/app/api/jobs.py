@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.database.database import SessionLocal
 from app.models.job import Job
@@ -11,6 +14,8 @@ router = APIRouter(
     tags=["Jobs"]
 )
 
+from datetime import datetime
+from pydantic import BaseModel
 
 def get_db():
 
@@ -21,28 +26,45 @@ def get_db():
 
     finally:
         db.close()
+        
+class JobUpdate(BaseModel):
+
+    status: str | None = None
+
+    notes: str | None = None
 
 
 
-@router.post("/", response_model=JobResponse)
-def create_job(
-    job: JobCreate,
-    db: Session = Depends(get_db)
+@router.patch("/{job_id}")
+def update_job(
+    job_id:int,
+    update:JobUpdate,
+    db:Session=Depends(get_db)
 ):
 
-    new_job = Job(**job.model_dump())
+    job = db.query(Job).filter(
+        Job.id == job_id
+    ).first()
 
-    db.add(new_job)
+
+    if not job:
+        return {
+            "error":"Job not found"
+        }
+
+
+    if update.status:
+        job.status = update.status
+
+        if update.status == "APPLIED":
+            job.applied_date=datetime.utcnow()
+
+
+    if update.notes:
+        job.notes=update.notes
+
+
     db.commit()
-    db.refresh(new_job)
+    db.refresh(job)
 
-    return new_job
-
-
-
-@router.get("/", response_model=list[JobResponse])
-def get_jobs(
-    db: Session = Depends(get_db)
-):
-
-    return db.query(Job).all()
+    return job

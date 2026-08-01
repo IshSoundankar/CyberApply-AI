@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from datetime import datetime
 
 from app.database.database import Base
 
@@ -7,58 +8,39 @@ class Job(Base):
 
     __tablename__ = "jobs"
 
+    id = Column(Integer, primary_key=True, index=True)
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    title = Column(String)
+    company = Column(String)
+    location = Column(String)
 
+    url = Column(String, nullable=True)
 
-    title = Column(
-        String,
-        nullable=False
-    )
+    source = Column(String)
 
+    description = Column(Text, nullable=True)
 
-    company = Column(
-        String,
-        nullable=False
-    )
+    # AI
+    ai_score = Column(Integer, default=0)
+    cv_type = Column(String, nullable=True)
 
-
-    location = Column(
-        String
-    )
-
-
-    url = Column(
-        String
-    )
-
-
-    source = Column(
-        String
-    )
-
-
-    description = Column(
-        Text
-    )
-
-
+    # Application tracking
     status = Column(
         String,
         default="NEW"
     )
 
-
-    ai_score = Column(
-        Integer,
-        default=0
+    applied_date = Column(
+        DateTime,
+        nullable=True
     )
 
+    notes = Column(
+        Text,
+        nullable=True
+    )
 
-    cv_type = Column(
-        String
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
     )

@@ -2,9 +2,11 @@ from app.database.database import SessionLocal
 
 from app.scraper.job_sources import load_companies
 from app.scraper.registry import get_scraper
+from app.scraper.detail_scraper import extract_job_description
 
 from app.services.job_service import save_job
 from app.services.job_filter import is_relevant_job
+
 
 
 def main():
@@ -38,6 +40,7 @@ def main():
             continue
 
 
+
         try:
 
             jobs = scraper(
@@ -56,6 +59,22 @@ def main():
 
 
         for job in jobs:
+
+
+            # Add full description
+
+            if not job.get("description"):
+
+                print(
+                    "Extracting:",
+                    job["title"]
+                )
+
+
+                job["description"] = extract_job_description(
+                    job.get("url")
+                )
+
 
 
             if not is_relevant_job(job):
