@@ -1,9 +1,12 @@
 from app.scraper.greenhouse import get_greenhouse_jobs
+from app.scraper.lever import get_lever_jobs
 
 
 SCRAPER_REGISTRY = {
 
-    "greenhouse": get_greenhouse_jobs
+    "greenhouse": get_greenhouse_jobs,
+
+    "lever": get_lever_jobs
 
 }
 

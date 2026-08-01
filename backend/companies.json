@@ -13,5 +13,11 @@
         "company": "HashiCorp",
         "platform": "greenhouse",
         "board": "hashicorp"
+    },
+
+    {
+        "company": "GitLab",
+        "platform": "lever",
+        "board": "gitlab"
     }
 ]
