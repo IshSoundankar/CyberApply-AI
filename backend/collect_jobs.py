@@ -1,112 +1,124 @@
-from app.database.database import SessionLocal
+import json
 
-from app.scraper.job_sources import load_companies
-from app.scraper.registry import get_scraper
-from app.scraper.detail_scraper import extract_job_description
+from app.database.database import Base, engine, SessionLocal
+
+# Register SQLAlchemy models BEFORE create_all
+from app.models.job import Job
 
 from app.services.job_service import save_job
+from app.scraper.registry import get_scraper
 from app.services.job_filter import is_relevant_job
+
+
+
+def load_companies():
+
+    with open("companies.json", "r") as file:
+        return json.load(file)
 
 
 
 def main():
 
+    print(
+        "Tables:",
+        Base.metadata.tables.keys()
+    )
+
+
+    Base.metadata.create_all(
+        bind=engine
+    )
+
+
     db = SessionLocal()
 
-    companies = load_companies()
 
-    total_saved = 0
+    try:
 
-
-    for company in companies:
-
-        print(
-            f"\nChecking {company['company']}..."
-        )
+        companies = load_companies()
 
 
-        scraper = get_scraper(
-            company.get("platform")
-        )
+        for company in companies:
 
-
-        if scraper is None:
 
             print(
-                f"Skipping {company['company']} - "
-                f"{company['platform']} scraper not available"
+                f"\nChecking {company['company']}..."
             )
 
-            continue
+
+            scraper = get_scraper(
+                company["platform"]
+            )
 
 
+            if not scraper:
 
-        try:
+                print(
+                    "No scraper found"
+                )
+
+                continue
+
+
 
             jobs = scraper(
                 company["board"]
             )
 
 
-        except Exception as error:
 
-            print(
-                f"Failed {company['company']}: {error}"
-            )
+            for job_data in jobs:
 
-            continue
-
-
-
-        for job in jobs:
-
-
-            # Add full description
-
-            if not job.get("description"):
 
                 print(
-                    "Extracting:",
-                    job["title"]
+                    f"Extracting: {job_data.get('title')}"
                 )
 
 
-                job["description"] = extract_job_description(
-                    job.get("url")
+                # Add company name
+                job_data["company"] = company["company"]
+
+
+
+                # Filter jobs before saving
+                if not is_relevant_job(job_data):
+
+                    print(
+                        f"Skipped: {job_data.get('title')}"
+                    )
+
+                    continue
+
+
+
+
+                saved = save_job(
+                    db,
+                    job_data
                 )
 
 
 
-            if not is_relevant_job(job):
-
-                continue
-
-
-
-            job["company"] = company["company"]
+                print(
+                    f"Saved: {saved.title} | Score: {saved.ai_score}"
+                )
 
 
-            saved = save_job(
-                db,
-                job
-            )
+
+    except Exception as e:
+
+        print(
+            "ERROR:",
+            e
+        )
 
 
-            total_saved += 1
 
+    finally:
 
-            print(
-                "Saved:",
-                saved.title
-            )
+        db.close()
 
-
-    db.close()
-
-
-    print(
-        f"\nFinished. Saved {total_saved} jobs."
-    )
 
 
 

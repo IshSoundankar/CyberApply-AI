@@ -1,5 +1,5 @@
 import requests
-
+from app.scraper.detail_scraper import extract_job_description
 
 GREENHOUSE_URL = "https://boards-api.greenhouse.io/v1/boards/{}/jobs"
 
@@ -64,11 +64,19 @@ def get_greenhouse_jobs(company_board):
             for word in CYBER_KEYWORDS
         ):
 
+            job_url = job.get("absolute_url")
+
+            description = extract_job_description(job_url)
+            print(
+                f"Description length: {len(description)}"
+            )
             jobs.append(
                 {
                     "title": title,
+                    "company": company_board,
                     "location": location,
-                    "url": job.get("absolute_url"),
+                    "url": job_url,
+                    "description": description,
                     "source": "Greenhouse"
                 }
             )

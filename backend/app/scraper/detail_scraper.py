@@ -29,27 +29,51 @@ def extract_job_description(url):
         )
 
 
-        # Remove unwanted elements
+        # Remove unwanted sections
 
         for tag in soup(
             [
                 "script",
                 "style",
                 "nav",
-                "footer"
+                "footer",
+                "header"
             ]
         ):
-            tag.extract()
+            tag.decompose()
 
 
 
-        text = soup.get_text(
-            separator=" ",
-            strip=True
+        # Greenhouse specific content
+
+        description = soup.find(
+            id="content"
         )
 
 
-        return text[:5000]
+        if description:
+
+            text = description.get_text(
+                separator=" ",
+                strip=True
+            )
+
+        else:
+
+            text = soup.get_text(
+                separator=" ",
+                strip=True
+            )
+
+
+        # Remove repeated whitespace
+
+        text = " ".join(
+            text.split()
+        )
+
+
+        return text[:8000]
 
 
     except Exception as error:

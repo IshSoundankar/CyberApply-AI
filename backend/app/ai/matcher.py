@@ -1,129 +1,120 @@
 from app.ai.profile_loader import load_profiles
 
 
-JUNIOR_WORDS = [
-    "junior",
-    "graduate",
-    "entry",
-    "associate",
-    "intern",
-    "trainee"
-]
+profiles = load_profiles()
 
 
-def calculate_score(job_text, profile):
+def calculate_match(job):
 
-    job_text = job_text.lower()
-
-    score = 0
-
-    skills = profile.get("skills", [])
-    roles = profile.get("roles", [])
+    title = job.get(
+        "title",
+        ""
+    ).lower()
 
 
-    for skill in skills:
-
-        if skill.lower() in job_text:
-            score += 5
-
-
-    for role in roles:
-
-        if role.lower() in job_text:
-            score += 10
+    description = job.get(
+        "description",
+        ""
+    ).lower()
 
 
-    # bonus for graduate/junior roles
-    if any(
-        word in job_text
-        for word in JUNIOR_WORDS
-    ):
-        score += 10
+    text = title + " " + description
 
 
-    return score
+    best_profile = None
+    best_score = 0
 
-
-
-def normalize_score(score):
-
-    # cap score at 100
-    return min(score, 100)
-
-
-
-def match_job(job):
-
-    profiles = load_profiles()
-
-
-    text = (
-        job.get("title", "")
-        + " "
-        + job.get("description", "")
-    )
-
-
-    results = []
+    best_matches = []
 
 
     for profile in profiles:
 
-        score = calculate_score(
-            text,
-            profile
-        )
+        score = 0
+
+        matches = []
 
 
-        results.append(
-            {
-                "profile": profile["name"],
-                "match": normalize_score(score),
-                "cv": profile["cv_file"]
-            }
-        )
+        # Skill matching
 
+        for skill in profile["skills"]:
 
-    results.sort(
-        key=lambda x: x["match"],
-        reverse=True
-    )
+            if skill.lower() in text:
 
+                score += 5
 
-    return results
+                matches.append(skill)
 
 
 
-if __name__ == "__main__":
+        # Role matching
+
+        for role in profile["roles"]:
+
+            if role.lower() in title:
+
+                score += 20
 
 
-    test_job = {
 
-        "title":
-        "Graduate SOC Analyst",
+        # Bonus for junior roles
 
-        "description":
-        """
-        SIEM monitoring
-        Wazuh
-        incident response
-        Linux
-        Python
-        threat detection
-        """
+        junior_keywords = [
+            "junior",
+            "graduate",
+            "associate",
+            "analyst",
+            "intern",
+            "entry",
+            "early career"
+        ]
+
+
+        for keyword in junior_keywords:
+
+            if keyword in title:
+
+                score += 10
+
+
+
+        if score > best_score:
+
+            best_score = score
+
+            best_profile = profile
+
+            best_matches = matches
+
+
+
+    missing = []
+
+    if best_profile:
+
+        missing = [
+            skill
+            for skill in best_profile["skills"]
+            if skill not in best_matches
+        ]
+
+
+
+    return {
+
+        "profile":
+            best_profile["name"]
+            if best_profile
+            else "Unknown",
+
+
+        "match":
+            min(best_score,100),
+
+
+        "matched_skills":
+            best_matches,
+
+
+        "missing_skills":
+            missing
     }
-
-
-    matches = match_job(test_job)
-
-
-    print("\nJob Match Results\n")
-
-
-    for match in matches:
-
-        print(
-            f'{match["profile"]}: '
-            f'{match["match"]}% '
-            f'({match["cv"]})'
-        )

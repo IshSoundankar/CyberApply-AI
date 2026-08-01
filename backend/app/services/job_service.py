@@ -1,40 +1,42 @@
 from sqlalchemy.orm import Session
 
 from app.models.job import Job
-from app.ai.matcher import match_job
+from app.ai.job_analyzer import analyze_job
+
 
 
 def save_job(
-    db: Session,
-    job_data: dict
+    db:Session,
+    job_data:dict
 ):
 
-    # Prevent duplicate jobs
+
     existing = db.query(Job).filter(
         Job.url == job_data.get("url")
     ).first()
 
+
+
     if existing:
+
         return existing
 
 
-    # AI CV matching
-    matches = match_job(job_data)
 
-    best_match = matches[0]
+    analysis = analyze_job(
+        job_data
+    )
 
 
-    # Create database entry
-    new_job = Job(
+
+    job = Job(
 
         title=job_data.get(
-            "title",
-            "Unknown"
+            "title"
         ),
 
         company=job_data.get(
-            "company",
-            "Unknown"
+            "company"
         ),
 
         location=job_data.get(
@@ -45,29 +47,34 @@ def save_job(
             "url"
         ),
 
-        source=job_data.get(
-            "source",
-            "Unknown"
-        ),
-
         description=job_data.get(
             "description",
             ""
         ),
 
+        source=job_data.get(
+            "source"
+        ),
+
+
         status="NEW",
 
-        ai_score=best_match["match"],
 
-        cv_type=best_match["profile"]
+        ai_score=
+            analysis["score"],
+
+
+        cv_type=
+            analysis["cv_type"]
+
     )
 
 
-    db.add(new_job)
+    db.add(job)
 
     db.commit()
 
-    db.refresh(new_job)
+    db.refresh(job)
 
 
-    return new_job
+    return job

@@ -2,35 +2,28 @@ import json
 import os
 
 
-PROFILE_PATH = "app/ai/profiles"
+PROFILE_DIR = os.path.join(
+    os.path.dirname(__file__),
+    "profiles"
+)
 
 
 def load_profiles():
 
     profiles = []
 
+    for filename in os.listdir(PROFILE_DIR):
 
-    for file in os.listdir(PROFILE_PATH):
+        if filename.endswith(".json"):
 
-        if file.endswith(".json"):
+            path = os.path.join(
+                PROFILE_DIR,
+                filename
+            )
 
-            with open(
-                os.path.join(PROFILE_PATH, file),
-                "r"
-            ) as f:
-
+            with open(path, "r") as file:
                 profiles.append(
-                    json.load(f)
+                    json.load(file)
                 )
 
-
     return profiles
-
-
-
-if __name__ == "__main__":
-
-    profiles = load_profiles()
-
-    for profile in profiles:
-        print(profile["name"])
